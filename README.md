@@ -78,7 +78,7 @@ python manage.py runserver
 
 ```bash
 # 1. Клонировать репозиторий
-git clone [URL-вашего-репозитория]
+git clone https://github.com/green-tea-end/books-vladivostok.git
 cd django_project
 
 # 2. Запустить проект
