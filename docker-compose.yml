@@ -1,103 +1,29 @@
-version: '3.8'
-
 services:
   mysql:
     image: mysql:8.0
-    container_name: books_mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: books_db
-      MYSQL_CHARSET: utf8mb4
-      MYSQL_COLLATION: utf8mb4_unicode_ci
     ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - "3307:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
-      retries: 10
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   web:
     build: .
-    container_name: books_web
     ports:
       - "8000:8000"
     depends_on:
       mysql:
         condition: service_healthy
-    environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_NAME: books_db
-      DB_USER: root
-      DB_PASSWORD: root
-      PYTHONUNBUFFERED: 1
     volumes:
       - .:/app
     command: >
       sh -c "
-      echo 'Ожидаем запуска MySQL...' &&
-      sleep 10 &&
+      echo 'Ожидаем готовности MySQL...' &&
+      sleep 20 &&
       cd django_project &&
-      echo 'Создаём таблицы...' &&
-      python -c '
-      import mysql.connector
-      import time
-      
-      for i in range(30):
-          try:
-              conn = mysql.connector.connect(
-                  host=\"mysql\",
-                  user=\"root\",
-                  password=\"root\",
-                  database=\"books_db\"
-              )
-              cursor = conn.cursor()
-              
-              # Создаём таблицы
-              cursor.execute(\"\"\"
-                  CREATE TABLE IF NOT EXISTS products (
-                      id INT PRIMARY KEY AUTO_INCREMENT,
-                      canonical_name VARCHAR(500) NOT NULL,
-                      author VARCHAR(300),
-                      isbn_clean VARCHAR(50) UNIQUE,
-                      publisher VARCHAR(200),
-                      year INT,
-                      genre VARCHAR(500),
-                      description TEXT,
-                      image_url TEXT,
-                      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                  ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
-              \"\"\")
-              
-              cursor.execute(\"\"\"
-                  CREATE TABLE IF NOT EXISTS offers (
-                      id INT PRIMARY KEY AUTO_INCREMENT,
-                      product_id INT,
-                      website_name VARCHAR(50) NOT NULL,
-                      price DECIMAL(10,2),
-                      old_price DECIMAL(10,2),
-                      discount VARCHAR(20),
-                      url TEXT NOT NULL,
-                      city VARCHAR(100),
-                      date_parsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                      FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-                  ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
-              \"\"\")
-              
-              print(\"Таблицы созданы успешно!\")
-              cursor.close()
-              conn.close()
-              break
-          except Exception as e:
-              print(f\"Попытка {i+1}: Ожидаем MySQL... {e}\")
-              time.sleep(2)
-      '
-      &&
-      echo 'Запускаем сервер...' &&
       python manage.py runserver 0.0.0.0:8000"
-
-volumes:
-  mysql_data:
