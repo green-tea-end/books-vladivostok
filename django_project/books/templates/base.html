@@ -4,15 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Книги Владивостока{% endblock %}</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        /* ВСЕ ОСНОВНЫЕ СТИЛИ ЗДЕСЬ! */
+        body { font-family: Arial; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { background: #2c3e50; color: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+        .search-box { margin: 20px 0; }
+        input[type="text"] { padding: 10px; width: 300px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+        .book-card { background: white; padding: 15px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .book-title { color: #2c3e50; margin-top: 0; }
+        .price { color: #e74c3c; font-weight: bold; }
+        footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; }
+
+        /* Дополнительные стили для других страниц */
+        .book-detail { background: white; padding: 30px; border-radius: 5px; margin-bottom: 20px; }
+        .book-image { max-width: 200px; float: right; margin-left: 20px; border-radius: 5px; }
+        .clear { clear: both; }
+        .offers-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .offers-table th, .offers-table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        .offers-table th { background: #f8f9fa; }
+        .old-price { text-decoration: line-through; color: #999; margin-left: 10px; }
+        .buy-btn { background: #27ae60; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; display: inline-block; }
+        .back-link { display: inline-block; margin-top: 20px; color: #3498db; text-decoration: none; }
+        .stats { background: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+        .results-info { background: white; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .pagination { margin-top: 30px; text-align: center; }
+        .pagination a { display: inline-block; padding: 8px 12px; margin: 0 5px; background: white; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #3498db; }
+        .pagination .current { background: #3498db; color: white; border-color: #3498db; }
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><a href="/">Книги Владивостока</a></h1>
+            <h1><a href="/" style="color: white; text-decoration: none;">Книги Владивостока</a></h1>
             <form class="search-box" action="{% url 'search' %}" method="get">
-                <input type="text" name="q" placeholder="Поиск книг по названию или автору..." value="{{ request.GET.q|default:'' }}">
+                <input type="text" name="q" placeholder="Поиск книг..." value="{{ request.GET.q|default:'' }}">
                 <button type="submit">Найти</button>
             </form>
         </header>
