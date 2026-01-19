@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная - Книги Владивостока{% endblock %}
+
+{% block content %}
+    <div class="stats">
+        <h2>Статистика базы данных</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+            <div style="background: #e8f4fc; padding: 15px; border-radius: 5px;">
+                <h3 style="margin-top: 0; color: #2c3e50;">Книг</h3>
+                <p style="font-size: 2em; font-weight: bold; color: #3498db; margin: 10px 0;">{{ total_books }}</p>
+            </div>
+            <div style="background: #e8f4fc; padding: 15px; border-radius: 5px;">
+                <h3 style="margin-top: 0; color: #2c3e50;">Предложений</h3>
+                <p style="font-size: 2em; font-weight: bold; color: #3498db; margin: 10px 0;">{{ total_offers }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="recent-books">
+        <h2>Последние добавленные книги</h2>
+
+        {% if recent_books %}
+            <div class="books-grid">
+                {% for book in recent_books %}
+                    <div class="book-card">
+                        {% if book.image_url %}
+                            <img src="{{ book.image_url }}" alt="{{ book.canonical_name }}"
+                                 style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;">
+                        {% endif %}
+
+                        <h3>{{ book.canonical_name|truncatechars:50 }}</h3>
+                        <p><strong>Автор:</strong> {{ book.author|default:"Не указан"|truncatechars:30 }}</p>
+
+                        <div style="margin: 15px 0;">
+                            {% if book.min_price %}
+                                <p class="price">от {{ book.min_price }} ₽</p>
+                            {% else %}
+                                <p style="color: #7f8c8d;">Цена не указана</p>
+                            {% endif %}
+                        </div>
+
+                        <p style="background: #f8f9fa; padding: 5px 10px; border-radius: 4px; display: inline-block;">
+                            {{ book.offers_count }} предложений
+                        </p>
+
+                        <div style="margin-top: 15px;">
+                            <a href="{% url 'book_detail' book.id %}" class="buy-btn" style="background: #3498db;">Подробнее →</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="text-align: center; padding: 40px; background: white; border-radius: 5px;">
+                Нет данных о книгах
+            </p>
+        {% endif %}
+    </div>
+{% endblock %}

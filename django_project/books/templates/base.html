@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Книги Владивостока{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><a href="/">Книги Владивостока</a></h1>
+            <form class="search-box" action="{% url 'search' %}" method="get">
+                <input type="text" name="q" placeholder="Поиск книг по названию или автору..." value="{{ request.GET.q|default:'' }}">
+                <button type="submit">Найти</button>
+            </form>
+        </header>
+
+        {% block content %}{% endblock %}
+
+        <footer>
+            <p>База данных книг из магазинов Владивостока</p>
+            <p>Читай-город • Буквоед • Лабиринт</p>
+            <p style="font-size: 0.8em; margin-top: 10px;">Курсовой проект по разработке интеграционной базы данных</p>
+        </footer>
+    </div>
+</body>
+</html>

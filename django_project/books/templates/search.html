@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if query %}Поиск: "{{ query }}"{% else %}Все книги{% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="results-info">
+        {% if query %}
+            <h2>Результаты поиска по запросу "{{ query }}"</h2>
+        {% else %}
+            <h2>Все книги</h2>
+        {% endif %}
+
+        <p>Найдено книг: <strong>{{ total }}</strong></p>
+    </div>
+
+    {% if books %}
+        <div class="books-grid">
+            {% for book in books %}
+                <div class="book-card">
+                    {% if book.image_url %}
+                        <img src="{{ book.image_url }}" alt="{{ book.canonical_name }}"
+                             style="width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;">
+                    {% endif %}
+
+                    <h3>{{ book.canonical_name|truncatechars:50 }}</h3>
+                    <p><strong>Автор:</strong> {{ book.author|default:"Не указан"|truncatechars:30 }}</p>
+
+                    <div style="margin: 15px 0;">
+                        {% if book.min_price %}
+                            <p class="price">от {{ book.min_price }} ₽</p>
+                        {% else %}
+                            <p style="color: #7f8c8d;">Цена не указана</p>
+                        {% endif %}
+                    </div>
+
+                    <p style="background: #f8f9fa; padding: 5px 10px; border-radius: 4px; display: inline-block;">
+                        {{ book.offers_count }} предложений
+                    </p>
+
+                    <div style="margin-top: 15px;">
+                        <a href="{% url 'book_detail' book.id %}" class="buy-btn" style="background: #3498db;">Подробнее →</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Пагинация -->
+        {% if page_obj.paginator.num_pages > 1 %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?q={{ query }}&page=1">« Первая</a>
+                    <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">‹ Назад</a>
+                {% endif %}
+
+                <span class="current">
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?q={{ query }}&page={{ page_obj.next_page_number }}">Далее ›</a>
+                    <a href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}">Последняя »</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <div style="text-align: center; padding: 40px; background: white; border-radius: 5px;">
+            <p style="font-size: 1.2em;">Книги не найдены</p>
+            {% if query %}
+                <p>Попробуйте изменить запрос или <a href="/">перейти ко всем книгам</a></p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <a href="/" class="back-link">← Назад на главную</a>
+{% endblock %}

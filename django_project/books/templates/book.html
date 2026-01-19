@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if book %}{{ book.canonical_name }}{% else %}Книга не найдена{% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if book %}
+        <div class="book-detail">
+            <div class="book-info">
+                {% if book.image_url %}
+                    <img src="{{ book.image_url }}" alt="{{ book.canonical_name }}" class="book-image" onerror="this.style.display='none'">
+                {% endif %}
+
+                <h2>{{ book.canonical_name }}</h2>
+
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                    <p><strong>Автор:</strong> {{ book.author|default:"Не указан" }}</p>
+                    <p><strong>ISBN:</strong> {{ book.isbn_clean|default:"Не указан" }}</p>
+                    <p><strong>Издательство:</strong> {{ book.publisher|default:"Не указано" }}</p>
+                    <p><strong>Год издания:</strong> {{ book.year|default:"Не указан" }}</p>
+                    <p><strong>Жанр:</strong> {{ book.genre|default:"Не указан" }}</p>
+                </div>
+
+                {% if book.description %}
+                    <div style="margin-top: 20px; background: #f8f9fa; padding: 20px; border-radius: 5px;">
+                        <h3>Описание</h3>
+                        <p>{{ book.description }}</p>
+                    </div>
+                {% endif %}
+
+                <div class="clear"></div>
+            </div>
+
+            <h3>Предложения в магазинах ({{ offers|length }})</h3>
+
+            {% if offers %}
+                <table class="offers-table">
+                    <thead>
+                        <tr>
+                            <th>Магазин</th>
+                            <th>Цена</th>
+                            <th>Скидка</th>
+                            <th>Город</th>
+                            <th>Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for offer in offers %}
+                            <tr>
+                                <td><strong>{{ offer.website_name }}</strong></td>
+                                <td>
+                                    {% if offer.price %}
+                                        <span class="price">{{ offer.price }} ₽</span>
+                                        {% if offer.old_price %}
+                                            <span class="old-price">{{ offer.old_price }} ₽</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span style="color: #7f8c8d;">Цена не указана</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if offer.discount %}
+                                        <span style="background: #e74c3c; color: white; padding: 3px 8px; border-radius: 3px; font-size: 0.9em;">
+                                            {{ offer.discount }}
+                                        </span>
+                                    {% else %}
+                                        <span style="color: #7f8c8d;">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ offer.city|default:"Владивосток" }}</td>
+                                <td>
+                                    {% if offer.url %}
+                                        <a href="{{ offer.url }}" target="_blank" class="buy-btn"
+                                           onclick="trackClick('{{ offer.website_name }}', '{{ book.canonical_name }}')">
+                                            Купить →
+                                        </a>
+                                    {% else %}
+                                        <span style="color: #7f8c8d;">Нет ссылки</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div style="padding: 30px; background: #f8f9fa; border-radius: 5px; text-align: center;">
+                    <p style="font-size: 1.1em;">Нет доступных предложений для этой книги</p>
+                    <p>Попробуйте поискать в других магазинах или зайти позже</p>
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="book-detail">
+            <h2>Книга не найдена</h2>
+            <p>Книга с ID {{ book_id }} не существует в базе данных.</p>
+            <a href="/" class="back-link">← Вернуться на главную</a>
+        </div>
+    {% endif %}
+
+    <div style="margin-top: 30px;">
+        <a href="/" class="back-link" style="margin-left: 20px;">← На главную</a>
+    </div>
+{% endblock %}
